@@ -20,7 +20,7 @@ Install The FlexSCADA Daemon, Grafana and Influxdb with the below script
 
 
 
-`
+```console
 mkdir ~/flexscada
 cd ~/flexscada
 
@@ -95,7 +95,7 @@ sudo docker run -d --net flexscada_network --ip $flexscada_d_host -p 7001:7001 -
  -e FS_GRAFANA_URL=$grafana_host \
  -e FS_INFLUXDB_URL=$influxdb_host \
  -i -t flexscada
-`
+```
 
 
 
@@ -105,4 +105,6 @@ sudo docker run -d --net flexscada_network --ip $flexscada_d_host -p 7001:7001 -
 
 To start the Docker daemon at boot, run:
 
-`rc-update add docker boot`
+```console
+rc-update add docker boot
+```
