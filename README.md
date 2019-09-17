@@ -33,7 +33,6 @@ Creating a new client account will create a new influxDB and Grafana user which 
 
 If you want to install additional plugins they can be copied into the ~/flexscada/grafana/plugins directory. If you do this dont forget to restart the docker container
 
-
 ```console
 sudo docker stop fs_grafana
 sudo docker start fs_grafana
@@ -42,8 +41,8 @@ Influxdb can also be stopped and started the same way
 
 ```console
 sudo docker stop fs_grafana
-s```udo docker start fs_grafana
-
+sudo docker start fs_grafana
+```
 And the FlexSCADA daemon
 
 ```console
@@ -57,7 +56,11 @@ sudo docker attach  fs_flexscada
 sudo docker attach  fs_influxdb
 sudo docker attach  fs_grafana
 ```
+View application status
 
+```console
+sudo docker ps -a
+```
 
 If you are running a reverse proxy to put grafana behind a high level url on your domain e.g. <domain.com>/cloud
 you will need to change the root url on grafana in the script below. The default for GRAFANA_ROOT is http://localhost:3000
