@@ -84,11 +84,11 @@ then just run the script below again to update all of the docker containers.  Yo
 
 
 ```console
-#!/bin/bash
-mkdir ~/flexscada
+#!/bin/bash -e
+mkdir -p ~/flexscada
 cd ~/flexscada
 
-sudo docker network create --subnet=172.18.0.0/16 flexscada_network
+sudo docker network create --subnet=172.18.0.0/16 flexscada_network || true
 
 influxdb_ip="172.18.0.20"
 grafana_ip="172.18.0.21"
@@ -97,7 +97,7 @@ flexscada_ip="172.18.0.22"
 
 ID=$(id -u) # saves your user id in the ID variable
 
-mkdir ~/flexscada/influxdb
+mkdir -p ~/flexscada/influxdb
 
 FILE=~/flexscada/key.txt
 if [ ! -f "$FILE" ]; then
@@ -111,8 +111,10 @@ GRAFANA_ROOT="http://localhost:3000"
 #override random password with below line
 #PASSWORD=myrandompassword
 
-sudo docker stop fs_influxdb
-sudo docker rm fs_influxdb
+echo "Deploying Influxdb Docker Image.."
+
+sudo docker stop fs_influxdb || true
+sudo docker rm fs_influxdb || true
 sudo docker run --net flexscada_network --ip $influxdb_ip --restart always -p 8086:8086 -d -p 8083:8083 \
     --name=fs_influxdb \
       -e INFLUXDB_HTTP_AUTH_ENABLED -e INFLUXDB_ADMIN_ENABLED=true \
@@ -121,21 +123,26 @@ sudo docker run --net flexscada_network --ip $influxdb_ip --restart always -p 80
       influxdb:latest
 
 
-mkdir ~/flexscada/grafana
-mkdir ~/flexscada/grafana/plugins
-mkdir ~/flexscada/grafana/logs
-mkdir ~/flexscada/grafana/conf
+echo "Deploying Grafana Plugins..."
+      
+mkdir -p ~/flexscada/grafana
+mkdir -p ~/flexscada/grafana/plugins
+mkdir -p ~/flexscada/grafana/logs
+mkdir -p ~/flexscada/grafana/conf
 
 cd ~/flexscada/grafana/plugins
-git clone https://github.com/comcomservices/FlexSCADA-Grafana-Map-Panel.git
-git clone https://github.com/ComComServicesLtd/flexscada-grafana-app.git
+git clone https://github.com/comcomservices/FlexSCADA-Grafana-Map-Panel.git || true
+git clone https://github.com/ComComServicesLtd/flexscada-grafana-app.git || true
+
 
 current_host="127.0.0.1"
 sed -i -e 's/'"$current_host"'/'"$flexscada_ip"'/g' ~/flexscada/grafana/plugins/flexscada-grafana-app/dist/plugin.json 
 
 
-sudo docker stop fs_grafana
-sudo docker rm fs_grafana
+echo "Deploying Grafana Docker Image.."
+
+sudo docker stop fs_grafana || true
+sudo docker rm fs_grafana || true
 
 
 sudo docker run -d --net flexscada_network --ip $grafana_ip --restart always --user $ID -p 3000:3000 \
@@ -149,13 +156,14 @@ sudo docker run -d --net flexscada_network --ip $grafana_ip --restart always --u
     grafana/grafana:latest
 
 
+echo "Deploying FlexSCADA Docker Image.."
     
-mkdir ~/flexscada/flexscada
-mkdir ~/flexscada/flexscada/logs
+mkdir -p ~/flexscada/flexscada
+mkdir -p ~/flexscada/flexscada/logs
 
     
-sudo docker stop fs_flexscada
-sudo docker rm fs_flexscada
+sudo docker stop fs_flexscada || true
+sudo docker rm fs_flexscada || true
 
 sudo docker run -d --net flexscada_network --ip $flexscada_ip -p 7001:7001 --name fs_flexscada --user $ID --restart always \
  -v ~/flexscada/flexscada:/flexscada \
@@ -163,6 +171,12 @@ sudo docker run -d --net flexscada_network --ip $flexscada_ip -p 7001:7001 --nam
  -e FS_GRAFANA_URL=http://$grafana_ip:3000 \
  -e FS_INFLUXDB_URL=http://$influxdb_ip:8086 \
  -i -t comcomservices/flexscada:latest
+
+ 
+ 
+echo "Setup is complete!  You can now login to your grafana account at $GRAFANA_ROOT with the username admin and password $PASSWORD"
+
+
 
 
 ```
