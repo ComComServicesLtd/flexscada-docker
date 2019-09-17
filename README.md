@@ -25,7 +25,7 @@ After running the below script you should be able to open your web browser to ht
 
 The first thing you will want to do after installing grafana is activate the flexSCADA plugin. This is done from the grafana web interface and is the same as any other plugin.   Use the key found in key.txt to activate the plugin.
 
-Initially you will be using the adming account on grafana, you will need to setup a client account before you can start adding flexSCADA devices.
+Initially you will be using the admin account on grafana, you will need to setup a client account before you can start adding flexSCADA devices.
 
 Do this by going to the FlexSCADA menu > Plugin Config and fill out the form for creating a new client account
 
@@ -58,7 +58,7 @@ If you are running a reverse proxy to put grafana behind a high level url on you
 you will need to change the root url on grafana in the script below. The default for GRAFANA_ROOT is http://localhost:3000
 You will also need to reverse proxy /plugins and /dashborad as below since there are some hard links there in the flexscada app plugin
 
-example nginx reverse proxy for accessing the grafana at /cloud, this is especially useful for shielding grafaa behind https
+example nginx reverse proxy for accessing the grafana at /cloud, this is especially useful for shielding grafana behind https
 
 ```
 location /cloud/ {
@@ -77,7 +77,7 @@ location /cloud/ {
   ```
 
 
-If you want to use email notifications you will have to also add the relevant confguration overrides to the docker start commands for grafana.
+If you want to use email notifications you will have to also add the relevant confguration overrides to the docker start commands for ana.
 
 See https://grafana.com/docs/installation/docker/ for more information.
 
@@ -200,11 +200,4 @@ echo "Setup is complete!  You can now login to your grafana account at $GRAFANA_
 
 
 
-
-
-
-To start the Docker daemon at boot, run:
-
-```console
-rc-update add docker boot
 ```
