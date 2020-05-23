@@ -23,6 +23,8 @@ RUN apk --update add --no-cache bash libstdc++ libgcc libcurl boost-system \
 COPY ./run.sh /run.sh
 COPY ./flexscada_d /usr/bin/flexscada_d
 EXPOSE 7001
+EXPOSE 8000
+EXPOSE 8001
 
 WORKDIR /flexscada
 ENTRYPOINT [ "/run.sh" ]
