@@ -54,6 +54,17 @@ View all application status
 sudo docker ps -a
 ```
 
+
+Logs for the Database, Daemon and Grafana can be accesesd through the docker log tool
+
+```console
+sudo docker logs --tail 100 --follow fs_flexscada
+sudo docker logs --tail 100 --follow fs_influxdb
+sudo docker logs --tail 100 --follow fs_grafana
+```
+
+
+
 If you are running a reverse proxy to put grafana behind a high level url on your domain e.g. <domain.com>/cloud
 you will need to change the root url on grafana in the script below. The default for GRAFANA_ROOT is http://localhost:3000
 You will also need to reverse proxy /plugins and /dashborad as below since there are some hard links there in the flexscada app plugin
@@ -132,7 +143,7 @@ echo "Deploying Influxdb Docker Image.."
 sudo docker stop fs_influxdb || true
 sudo docker rm fs_influxdb || true
 sudo docker run --net flexscada_network --ip $influxdb_ip --restart always -p 8086:8086 -d -p 8083:8083 \
-    --name=fs_influxdb \
+    --name=fs_influxdb --log-opt max-size=10m --log-opt max-file=5 \
       -e INFLUXDB_HTTP_AUTH_ENABLED -e INFLUXDB_ADMIN_ENABLED=true \
       -e INFLUXDB_ADMIN_USER=admin -e INFLUXDB_ADMIN_PASSWORD=$PASSWORD \
       -v ~/flexscada/influxdb:/var/lib/influxdb \
@@ -162,7 +173,7 @@ sudo docker rm fs_grafana || true
 
 
 sudo docker run -d --net flexscada_network --ip $grafana_ip --restart always --user $ID -p 3000:3000 \
-    --name=fs_grafana \
+    --name=fs_grafana --log-opt max-size=10m --log-opt max-file=5 \
   -e GF_SERVER_ROOT_URL=$GRAFANA_ROOT \
   -e GF_SECURITY_ADMIN_PASSWORD=$PASSWORD \
   -e GF_PATHS_LOGS=/var/lib/grafana/logs \
@@ -181,7 +192,7 @@ mkdir -p ~/flexscada/flexscada/logs
 sudo docker stop fs_flexscada || true
 sudo docker rm fs_flexscada || true
 
-sudo docker run -d --net flexscada_network --ip $flexscada_ip -p 7001:7001 --name fs_flexscada --user $ID --restart always \
+sudo docker run -d --net flexscada_network --ip $flexscada_ip -p 7001:7001 --name fs_flexscada --user $ID --restart always --log-opt max-size=10m --log-opt max-file=5 \
  -v ~/flexscada/flexscada:/flexscada \
  -e FS_ADMIN_KEY=$PASSWORD \
  -e FS_GRAFANA_URL=http://$grafana_ip:3000 \
