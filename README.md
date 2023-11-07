@@ -119,7 +119,7 @@ install script
 
 ```console
 #!/bin/bash -e
-rootDir="/home/jon/flexscada"
+rootDir="/home/administrator/flexscada"
 
 influxdb_ip="172.18.0.20"
 grafana_ip="172.18.0.21"
