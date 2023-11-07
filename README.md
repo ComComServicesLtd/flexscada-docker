@@ -97,8 +97,7 @@ See https://grafana.com/docs/installation/docker/ for more information.
 
 ## Reinstalling / Updating
 
-Delete all of the included plugins (flexscada-grafana-app, pie chart etc)
-then just run the script below again to update all of the docker containers.  Your data and configurations should not be lost since they are stored in seperate volumes outside the docker containers.
+Just run the script below again to update all of the docker containers.  Your data and configurations should not be lost since they are stored in seperate volumes outside the docker containers.
 
 
 
@@ -108,19 +107,27 @@ then just run the script below again to update all of the docker containers.  Yo
 ## Install Script
 
 Tested on Ubuntu Linux. Requires Docker and Git be installed
-Update the rootDir variable to where you want to install the software suite
+
+*   Copy the below script into a file called fs_install.sh on your local machine
+*   Modify the fs_install.sh file and adjust the rootDir variable to match your desired install path.
+*   Make any custom modifications as needed for your system (ports, url's etc)
+*   chmod +x ./fs_install.sh
+*   sudo ./fs_install.sh
+
+
+install script
 
 ```console
 #!/bin/bash -e
-rootDir="/home/user/flexscada"
+rootDir="/home/jon/flexscada"
 
 influxdb_ip="172.18.0.20"
 grafana_ip="172.18.0.21"
 flexscada_ip="172.18.0.22"
 
-cfg_influxdb="false"
+cfg_influxdb="true"
 cfg_grafana="true"
-cfg_flexscada="false"
+cfg_flexscada="true"
 
 GRAFANA_ROOT="http://localhost:3000"
 
@@ -153,6 +160,8 @@ echo "Deploying Influxdb Docker Image.."
 
 sudo docker stop fs_influxdb || true
 sudo docker rm fs_influxdb || true
+sudo docker pull influxdb:1.8.10 || true
+
 sudo docker run --net flexscada_network --ip $influxdb_ip --restart always -d \
     --name=fs_influxdb -p 8086:8086 --log-opt max-size=10m --log-opt max-file=5 \
       -e INFLUXDB_HTTP_AUTH_ENABLED -e INFLUXDB_ADMIN_ENABLED=true \
@@ -164,7 +173,7 @@ sudo docker run --net flexscada_network --ip $influxdb_ip --restart always -d \
       -e GOMAXPROCS=8 \
       -e INFLUXDB_HTTP_LOG_ENABLED=false \
       -v $rootDir/influxdb:/var/lib/influxdb \
-      influxdb:latest
+      influxdb:1.8.10
 
 fi
 
@@ -190,7 +199,7 @@ echo "Deploying Grafana Docker Image.."
 
 sudo docker stop fs_grafana || true
 sudo docker rm fs_grafana || true
-#sudo docker pull grafana/grafana:latest || true
+sudo docker pull grafana/grafana-oss:10.2.0 || true
 
 sudo chmod -R 777 $rootDir/grafana
 sudo chown -R 472:472 $rootDir/grafana
@@ -210,7 +219,7 @@ sudo docker run -d --net flexscada_network --ip $grafana_ip --restart always --u
   -e "GF_CONTENT_SECURITY_POLICY=false" \
   -e "GF_UNIFIED_ALERTING_ENABLED=true" \
   -v $rootDir/grafana:/var/lib/grafana \
-    grafana/grafana-oss-dev:9.4.0-96312pre
+    grafana/grafana-oss:10.2.0
 
 fi
 
@@ -241,6 +250,7 @@ fi
 
 echo "Setup is complete!  You can now login to your grafana account at $GRAFANA_ROOT with the username admin and password $PASSWORD"
 echo "You can also login directly to the FlexSCADA management app at http://localhost:7001/login using the API Key $PASSWORD"
+
 
 
 
